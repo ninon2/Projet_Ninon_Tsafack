@@ -1,13 +1,19 @@
 package com.example.Projet_Ninon_Tsafack.model;
+
 import jakarta.persistence.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
+import java.util.List;
 
 @Entity
-public class Client {
-
+@Data
+@NoArgsConstructor
+public class Client implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String nom;
     private String prenom;
     private String adresse;
@@ -15,7 +21,8 @@ public class Client {
     private String ville;
     private String telephone;
 
-    public Client() {}
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Compte> comptes;
 
     public Client(String nom, String prenom, String adresse, String codePostal, String ville, String telephone) {
         this.nom = nom;
@@ -25,19 +32,4 @@ public class Client {
         this.ville = ville;
         this.telephone = telephone;
     }
-
-    // GETTERS & SETTERS
-    public Long getId() { return id; }
-    public String getNom() { return nom; }
-    public void setNom(String nom) { this.nom = nom; }
-    public String getPrenom() { return prenom; }
-    public void setPrenom(String prenom) { this.prenom = prenom; }
-    public String getAdresse() { return adresse; }
-    public void setAdresse(String adresse) { this.adresse = adresse; }
-    public String getCodePostal() { return codePostal; }
-    public void setCodePostal(String codePostal) { this.codePostal = codePostal; }
-    public String getVille() { return ville; }
-    public void setVille(String ville) { this.ville = ville; }
-    public String getTelephone() { return telephone; }
-    public void setTelephone(String telephone) { this.telephone = telephone; }
 }

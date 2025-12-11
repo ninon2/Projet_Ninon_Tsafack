@@ -1,55 +1,82 @@
 package com.example.Projet_Ninon_Tsafack.service;
+
+import com.example.Projet_Ninon_Tsafack.dto.ClientDto;
+import com.example.Projet_Ninon_Tsafack.dto.CreateClientDto;
+import com.example.Projet_Ninon_Tsafack.dto.UpdateClientDto;
+import com.example.Projet_Ninon_Tsafack.exceptions.ResourceNotFoundException;
+import com.example.Projet_Ninon_Tsafack.mapper.ClientMapper;
 import com.example.Projet_Ninon_Tsafack.model.Client;
+import com.example.Projet_Ninon_Tsafack.model.CompteCourant;
+import com.example.Projet_Ninon_Tsafack.model.CompteEpargne;
 import com.example.Projet_Ninon_Tsafack.repository.ClientRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import jakarta.annotation.PostConstruct;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import java.util.Optional;
+import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class ClientServiceImpl implements ClientService {
 
-    private final ClientRepository repo;
+    private final ClientRepository clientRepository;
+    private final ClientMapper clientMapper;
 
-    public ClientServiceImpl(ClientRepository repo) {
-        this.repo = repo;
-    }
-
-    @PostConstruct
-    private void initDb() {
-        repo.saveAll(List.of(
-                new Client("Madeleine", "Ford", "Adresse 1", "75000", "Paris", "0600000000"),
-                new Client("Laura", "Pats", "Adresse 2", "69000", "Lyon", "0611111111")
-        ));
+    @Override
+    public List<ClientDto> getClients() {
+        return clientRepository.findAll().stream()
+                .map(clientMapper::toDto)
+                .toList();
     }
 
     @Override
-    public List<Client> getClients() {
-        return repo.findAll();
+    public ClientDto getClient(Long id) {
+        return clientRepository.findById(id)
+                .map(clientMapper::toDto)
+                .orElseThrow(() -> new ResourceNotFoundException("Client not found"));
     }
 
     @Override
-    public Client create(Client c) {
-        return repo.save(c);
-    }
+    public ClientDto create(CreateClientDto createClientDto) {
+        Client client = clientMapper.toEntity(createClientDto);
+        client.setComptes(new ArrayList<>());
 
-    @Override
-    public Optional<Client> getClient(Long id) {
-        return repo.findById(id);
-    }
-
-    @Override
-    public Optional<Client> update(Client c) {
-        if (repo.existsById(c.getId())) {
-            return Optional.of(repo.save(c));
+        if (createClientDto.createCompteCourant()) {
+            CompteCourant compteCourant = new CompteCourant();
+            compteCourant.setNumeroCompte(UUID.randomUUID().toString());
+            compteCourant.setDateOuverture(new Date());
+            compteCourant.setClient(client);
+            client.getComptes().add(compteCourant);
         }
-        return Optional.empty();
+
+        if (createClientDto.createCompteEpargne()) {
+            CompteEpargne compteEpargne = new CompteEpargne();
+            compteEpargne.setNumeroCompte(UUID.randomUUID().toString());
+            compteEpargne.setDateOuverture(new Date());
+            compteEpargne.setClient(client);
+            client.getComptes().add(compteEpargne);
+        }
+
+        return clientMapper.toDto(clientRepository.save(client));
+    }
+
+    @Override
+    public ClientDto update(Long id, UpdateClientDto updateClientDto) {
+        Client client = clientRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Client not found"));
+
+        clientMapper.updateClientFromDto(updateClientDto, client);
+
+        return clientMapper.toDto(clientRepository.save(client));
     }
 
     @Override
     public void delete(Long id) {
-        repo.deleteById(id);
+        if (!clientRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Client not found");
+        }
+        clientRepository.deleteById(id);
     }
 }
-

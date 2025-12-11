@@ -1,17 +1,21 @@
 package com.example.Projet_Ninon_Tsafack.service;
-import com.example.Projet_Ninon_Tsafack.model.Client;
+
+import com.example.Projet_Ninon_Tsafack.dto.ClientDto;
+import com.example.Projet_Ninon_Tsafack.dto.CreateClientDto;
+import com.example.Projet_Ninon_Tsafack.dto.UpdateClientDto;
+
 import java.util.List;
 import java.util.Optional;
 
 public interface ClientService {
 
-    List<Client> getClients();
+    List<ClientDto> getClients();
 
-    Client create(Client c);
+    ClientDto create(CreateClientDto c);
 
-    Optional<Client> getClient(Long id);
+    ClientDto getClient(Long id);
 
-    Optional<Client> update(Client c);
+    ClientDto update(Long id, UpdateClientDto c);
 
     void delete(Long id);
 }

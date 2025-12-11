@@ -1,47 +1,46 @@
 package com.example.Projet_Ninon_Tsafack.controller;
-import com.example.Projet_Ninon_Tsafack.model.Client;
+
+import com.example.Projet_Ninon_Tsafack.dto.ClientDto;
+import com.example.Projet_Ninon_Tsafack.dto.CreateClientDto;
+import com.example.Projet_Ninon_Tsafack.dto.UpdateClientDto;
 import com.example.Projet_Ninon_Tsafack.service.ClientService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
+@RequestMapping("/clients")
+@RequiredArgsConstructor
 public class ClientController {
 
-    private final ClientService service;
+    private final ClientService clientService;
 
-    public ClientController(ClientService service) {
-        this.service = service;
+    @GetMapping
+    public ResponseEntity<List<ClientDto>> getClients() {
+        return ResponseEntity.ok(clientService.getClients());
     }
 
-    @GetMapping("clients")
-    public List<Client> getClients() {
-        return service.getClients();
+    @GetMapping("/{id}")
+    public ResponseEntity<ClientDto> getClient(@PathVariable Long id) {
+        return ResponseEntity.ok(clientService.getClient(id));
     }
 
-    @PostMapping("clients")
-    public Client createClient(@RequestBody Client client) {
-        return service.create(client);
+    @PostMapping
+    public ResponseEntity<ClientDto> createClient(@RequestBody CreateClientDto createClientDto) {
+        return new ResponseEntity<>(clientService.create(createClientDto), HttpStatus.CREATED);
     }
 
-    @GetMapping("clients/{id}")
-    public ResponseEntity<Client> getClient(@PathVariable Long id) {
-        return service.getClient(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    @PutMapping("/{id}")
+    public ResponseEntity<ClientDto> updateClient(@PathVariable Long id, @RequestBody UpdateClientDto updateClientDto) {
+        return ResponseEntity.ok(clientService.update(id, updateClientDto));
     }
 
-    @PutMapping("clients/update")
-    public ResponseEntity<Client> updateClient(@RequestBody Client client) {
-        return service.update(client)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
-
-    @DeleteMapping("clients/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteClient(@PathVariable Long id) {
-        service.delete(id);
+        clientService.delete(id);
         return ResponseEntity.noContent().build();
     }
 }

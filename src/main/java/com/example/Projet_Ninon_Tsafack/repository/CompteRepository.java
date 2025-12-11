@@ -1,4 +1,6 @@
 package com.example.Projet_Ninon_Tsafack.repository;
 
-public class CompteRepository {
-}
+import com.example.Projet_Ninon_Tsafack.model.Compte;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface CompteRepository extends JpaRepository<Compte, Long> {}
