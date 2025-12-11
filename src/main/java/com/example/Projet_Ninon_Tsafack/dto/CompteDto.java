@@ -5,8 +5,10 @@ import java.util.Date;
 public record CompteDto(
         Long id,
         String numeroCompte,
-        double solde,
+        Double solde,
         Date dateOuverture,
-        String typeCompte
+        String typeCompte,
+        Double decouvertAutorise,
+        Double tauxRemuneration
 ) {
 }

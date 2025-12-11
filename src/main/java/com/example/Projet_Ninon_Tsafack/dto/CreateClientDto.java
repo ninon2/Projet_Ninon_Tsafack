@@ -7,7 +7,7 @@ public record CreateClientDto(
         String codePostal,
         String ville,
         String telephone,
-        boolean createCompteCourant,
-        boolean createCompteEpargne
+        CreateCompteCourantDto createCompteCourantDto,
+        CreateCompteEpargneDto createCompteEpargneDto
 ) {
 }

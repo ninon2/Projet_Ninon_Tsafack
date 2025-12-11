@@ -1,6 +1,8 @@
 package com.example.Projet_Ninon_Tsafack.controller;
 
 import com.example.Projet_Ninon_Tsafack.dto.CreateClientDto;
+import com.example.Projet_Ninon_Tsafack.dto.CreateCompteCourantDto;
+import com.example.Projet_Ninon_Tsafack.dto.CreateCompteEpargneDto;
 import com.example.Projet_Ninon_Tsafack.dto.UpdateClientDto;
 import com.example.Projet_Ninon_Tsafack.model.Client;
 import com.example.Projet_Ninon_Tsafack.repository.ClientRepository;
@@ -48,13 +50,22 @@ class ClientControllerTest {
 
     @Test
     void testCreateClient() throws Exception {
-        CreateClientDto createClientDto = new CreateClientDto("New", "Client", "456 Avenue", "54321", "Town", "0987654321", true, false);
+        CreateCompteCourantDto createCompteCourantDto = new CreateCompteCourantDto(1000.0, 500.0);
+        CreateCompteEpargneDto createCompteEpargneDto = new CreateCompteEpargneDto(2000.0, 0.05);
+
+        CreateClientDto createClientDto = new CreateClientDto(
+                "New", "Client", "456 Avenue", "54321", "Town", "0987654321",
+                createCompteCourantDto, createCompteEpargneDto);
 
         mockMvc.perform(post("/clients")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createClientDto)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.nom").value("New"));
+                .andExpect(jsonPath("$.nom").value("New"))
+                .andExpect(jsonPath("$.comptes[0].solde").value(1000.0))
+                .andExpect(jsonPath("$.comptes[0].decouvertAutorise").value(500.0))
+                .andExpect(jsonPath("$.comptes[1].solde").value(2000.0))
+                .andExpect(jsonPath("$.comptes[1].tauxRemuneration").value(0.05));
     }
 
     @Test

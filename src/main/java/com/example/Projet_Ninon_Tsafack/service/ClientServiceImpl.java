@@ -43,19 +43,23 @@ public class ClientServiceImpl implements ClientService {
         Client client = clientMapper.toEntity(createClientDto);
         client.setComptes(new ArrayList<>());
 
-        if (createClientDto.createCompteCourant()) {
+        if (createClientDto.createCompteCourantDto() != null) {
             CompteCourant compteCourant = new CompteCourant();
             compteCourant.setNumeroCompte(UUID.randomUUID().toString());
             compteCourant.setDateOuverture(new Date());
             compteCourant.setClient(client);
+            compteCourant.setSolde(createClientDto.createCompteCourantDto().initialSolde() != null ? createClientDto.createCompteCourantDto().initialSolde() : 0.0);
+            compteCourant.setDecouvertAutorise(createClientDto.createCompteCourantDto().decouvertAutorise() != null ? createClientDto.createCompteCourantDto().decouvertAutorise() : 1000.0);
             client.getComptes().add(compteCourant);
         }
 
-        if (createClientDto.createCompteEpargne()) {
+        if (createClientDto.createCompteEpargneDto() != null) {
             CompteEpargne compteEpargne = new CompteEpargne();
             compteEpargne.setNumeroCompte(UUID.randomUUID().toString());
             compteEpargne.setDateOuverture(new Date());
             compteEpargne.setClient(client);
+            compteEpargne.setSolde(createClientDto.createCompteEpargneDto().initialSolde() != null ? createClientDto.createCompteEpargneDto().initialSolde() : 0.0);
+            compteEpargne.setTauxRemuneration(createClientDto.createCompteEpargneDto().tauxRemuneration() != null ? createClientDto.createCompteEpargneDto().tauxRemuneration() : 0.03);
             client.getComptes().add(compteEpargne);
         }
 
